@@ -4,8 +4,7 @@ import logo from '../assets/logo.png'
 import { Link, useNavigate } from 'react-router-dom'
 import { useSelector, useDispatch } from 'react-redux'
 import { setUserData } from '../redux/userSlice'
-import axios from 'axios'
-import { serverUrl } from '../App'
+import API from '../services/api'
 
 function Navbar() {
   // ⚡ CRITICAL FIX: Direct number selector use karne se Redux state change hone par UI instantly update ho jata hai!
@@ -19,7 +18,8 @@ function Navbar() {
 
   const handleSignOut = async () => {
     try {
-      await axios.get(serverUrl + "/api/auth/logout", { withCredentials: true })
+      await API.get("/api/auth/logout")
+      localStorage.removeItem("token")
       dispatch(setUserData(null))
       setShowProfile(false)
       navigate("/auth")

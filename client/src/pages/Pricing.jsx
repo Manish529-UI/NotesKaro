@@ -1,10 +1,9 @@
 import React, { useState } from 'react'
 import { useNavigate } from 'react-router-dom'
 import { motion } from "framer-motion"
-import axios from "axios"
 import { useSelector, useDispatch } from "react-redux"
 import { updateCredits } from "../redux/userSlice"
-import { serverUrl } from "../App"
+import API from "../services/api"
 
 // ─── Plans Definition ────────────────────────────────────────
 const PLANS = [
@@ -62,10 +61,9 @@ function Pricing() {
             setPaying(true)
 
             // 1. Create order on backend
-            const { data } = await axios.post(
-                serverUrl + "/api/payment/create-order",
-                { amount },
-                { withCredentials: true }
+            const { data } = await API.post(
+                "/api/payment/create-order",
+                { amount }
             );
 
             if (!data.success || !data.order) {
@@ -93,14 +91,13 @@ function Pricing() {
                 order_id: data.order.id,
                 handler: async (response) => {
                     try {
-                        const verifyRes = await axios.post(
-                            serverUrl + "/api/payment/verify-payment",
+                        const verifyRes = await API.post(
+                            "/api/payment/verify-payment",
                             {
                                 ...response,
                                 userId: userData?._id,
                                 creditsToAdd: creditsToAdd
-                            },
-                            { withCredentials: true }
+                            }
                         );
                         if (verifyRes.data.success) {
                             // Update credits in Redux store immediately

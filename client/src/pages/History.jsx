@@ -1,4 +1,4 @@
-import axios from 'axios'
+import API from '../services/api'
 import React, { useEffect, useState } from 'react'
 import { serverUrl } from '../App'
 import { motion, AnimatePresence } from 'framer-motion'
@@ -20,7 +20,7 @@ const [activeNoteId, setActiveNoteId] = useState(null);
   useEffect(() => {
     const myNotes = async () => {
       try {
-        const res = await axios.get(serverUrl + "/api/notes/getnotes", { withCredentials: true })
+        const res = await API.get("/api/notes/getnotes")
         setTopics(Array.isArray(res.data) ? res.data : [])
       } catch (error) {
       }
@@ -32,7 +32,7 @@ const [activeNoteId, setActiveNoteId] = useState(null);
     setLoading(true)
     setActiveNoteId(noteId);
     try {
-        const res = await axios.get(serverUrl + `/api/notes/getnotes/${noteId}`, { withCredentials: true })
+        const res = await API.get(`/api/notes/getnotes/${noteId}`)
         setSelectedNote(res.data.content)
         setLoading(false)
     } catch (error) {

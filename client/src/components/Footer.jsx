@@ -2,9 +2,8 @@ import React from 'react'
 import { motion } from 'framer-motion'
 import { Link, useNavigate } from 'react-router-dom'
 import { useDispatch } from 'react-redux'
-import axios from 'axios'
-import { serverUrl } from '../App'
 import { setUserData } from '../redux/userSlice'
+import API from '../services/api'
 
 import logo from '../assets/logo.png'
 
@@ -14,9 +13,9 @@ function Footer() {
 
   const handleSignOut = async () => {
     try {
-      await axios.get(serverUrl + "/api/auth/logout", { withCredentials: true })
+      await API.get("/api/auth/logout")
+      localStorage.removeItem("token")
       dispatch(setUserData(null))
-      setShowProfile(false)
       navigate("/auth")
     } catch (error) {
       console.error("Error signing out:", error)

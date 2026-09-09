@@ -1,16 +1,14 @@
 import React from 'react'
 import { motion } from 'framer-motion'
 import { FcGoogle } from 'react-icons/fc'
-import { signInWithPopup } from "firebase/auth"; // 👈 Unused signInWithRedirect removed
+import { signInWithPopup } from "firebase/auth";
 import { auth, provider } from '../utils/firebase';
-import axios from 'axios';
 import logo from '../assets/logo.png'
 
-// 🛑 FIX 1: Missing Redux imports added
 import { useDispatch } from 'react-redux';
-import { setUserData } from '../redux/userSlice'; // 👈 Sahi path set karein apne slice ka
+import { setUserData } from '../redux/userSlice';
 
-import { serverUrl } from '../App';
+import API from '../services/api';
 
 function Auth() {
   const dispatch = useDispatch();
@@ -21,8 +19,11 @@ function Auth() {
       const User = response.user;
       const name = User.displayName;
       const email = User.email;
-      const result = await axios.post(serverUrl + "/api/auth/google", { name, email }, { withCredentials: true });
-      dispatch(setUserData(result.data));
+      const result = await API.post("/api/auth/google", { name, email });
+      
+      // Save token to localStorage and user to Redux
+      localStorage.setItem("token", result.data.token);
+      dispatch(setUserData(result.data.user));
       
     } catch (error) {
       console.error("Error during Google authentication:", error);
