@@ -32,7 +32,9 @@ app.use(cors({
 
 app.use(express.json());
 app.use(cookieParser());
-app.use(mongoSanitize()); // Strip $ and . from req.body/query/params to prevent NoSQL injection
+app.use(mongoSanitize({
+  replaceWith: '_'
+})); // Strip $ and . from req.body/query/params safely
 
 // Rate limiter — 100 requests per 15 minutes per IP on all /api/ routes
 const apiLimiter = rateLimit({
