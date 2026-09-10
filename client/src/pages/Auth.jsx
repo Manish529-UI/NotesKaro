@@ -1,7 +1,8 @@
 import React from 'react'
 import { motion } from 'framer-motion'
 import { FcGoogle } from 'react-icons/fc'
-import { signInWithPopup } from "firebase/auth";
+import { signInWithRedirect, getRedirectResult } from "firebase/auth";
+import { useNavigate } from "react-router-dom";
 import { auth, provider } from '../utils/firebase';
 import logo from '../assets/logo.png'
 
@@ -13,20 +14,38 @@ import API from '../services/api';
 function Auth() {
   const dispatch = useDispatch();
 
-  const handleGoogleAuth = async () => { 
+  const navigate = useNavigate();
+
+  // Use useEffect to handle the redirect result from Firebase
+  React.useEffect(() => {
+    const handleRedirectResult = async () => {
+      try {
+        const response = await getRedirectResult(auth);
+        if (response && response.user) {
+          const User = response.user;
+          const name = User.displayName;
+          const email = User.email;
+          
+          const result = await API.post("/api/auth/google", { name, email });
+          
+          // Save token to localStorage and user to Redux
+          localStorage.setItem("token", result.data.token);
+          dispatch(setUserData(result.data.user));
+          navigate("/"); // Explicit redirect
+        }
+      } catch (error) {
+        console.error("Error handling redirect authentication:", error);
+        alert("Authentication failed: " + (error?.response?.data?.message || error.message));
+      }
+    };
+    handleRedirectResult();
+  }, [dispatch, navigate]);
+
+  const handleGoogleAuth = () => { 
     try {
-      const response = await signInWithPopup(auth, provider);
-      const User = response.user;
-      const name = User.displayName;
-      const email = User.email;
-      const result = await API.post("/api/auth/google", { name, email });
-      
-      // Save token to localStorage and user to Redux
-      localStorage.setItem("token", result.data.token);
-      dispatch(setUserData(result.data.user));
-      
+      signInWithRedirect(auth, provider);
     } catch (error) {
-      console.error("Error during Google authentication:", error);
+      console.error("Error initiating Google authentication:", error);
     }
   };
 
