@@ -9,6 +9,10 @@ const userSchema = new mongoose.Schema({
         required: true,
         unique: true
     },
+    password: {
+        type: String,
+        // Not required — Google auth users won't have a password
+    },
     credits: {
         type: Number,
         default: 50,
