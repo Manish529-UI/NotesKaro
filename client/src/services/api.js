@@ -1,6 +1,7 @@
 import axios from "axios";
-import { serverUrl } from '../App';
 import { setUserData } from "../redux/userSlice";
+
+const serverUrl = import.meta.env.VITE_API_URL || "http://localhost:8000";
 
 // Centralized Axios instance with Bearer token interceptor
 const API = axios.create({
